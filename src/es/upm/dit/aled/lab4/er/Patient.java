@@ -1,6 +1,7 @@
 package es.upm.dit.aled.lab4.er;
 
 import java.awt.Color;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class Patient extends Thread {
 	/**
 	 * Builds a new Patient.
 	 * 
-	 * @param numbre          The number of the Patient.
+	 * @param number          The number of the Patient.
 	 * @param initialLocation The initial location of the Patient.
 	 */
 	public Patient(int number, Area initialLocation) {
@@ -129,8 +130,13 @@ public class Patient extends Thread {
 	 * Advances the Patient's protocol. The Patient is moved to the new Area, the
 	 * movement is animated by the GUI and the index is increased by one.
 	 */
+	
+	
 	private void advanceProtocol() {
-		// TODO
+		Transfer t = protocol.get(indexProtocol);
+		EmergencyRoomGUI.getInstance().animateTransfer(this, t);
+		location = t.getTo();
+		indexProtocol++;
 	}
 
 	/**
@@ -139,7 +145,11 @@ public class Patient extends Thread {
 	 * Area.
 	 */
 	private void attendedAtLocation() {
-		// TODO
+		try{
+			Thread.sleep(location.getTime());
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -149,7 +159,12 @@ public class Patient extends Thread {
 	 */
 	@Override
 	public void run() {
-		// TODO
+		attendedAtLocation();
+		for(Transfer t : protocol) {
+			attendedAtLocation();
+			advanceProtocol();
+		}
+		EmergencyRoomGUI.getInstance().removePatient(this);
 	}
 
 }
